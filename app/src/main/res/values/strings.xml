@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Employee App</string>
+    <string name="employee_name_holder">Employee Name</string>
+    <string name="employee_name_hint">Employee Name</string>
+    <string name="add_button_text">Add</string>
+    <string name="edit_button_text">Edit</string>
+    <string name="employees_list_empty_msg">Employees list is empty</string>
+    <string name="delete_menu">Delete</string>
+    <string name="edit_menu">Edit</string>
+</resources>

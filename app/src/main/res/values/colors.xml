@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#194EE3</color>
+    <color name="colorPrimaryDark">#0338C1</color>
+    <color name="colorAccent">#24D7DD</color>
+
+    <color name="fabColor">#24D7DD</color>
+
+    <color name="snackbarAddSuccess">#15B81C</color>
+    <color name="snackbarEditSuccess">#096DD6</color>
+    <color name="snackbarDeleteSuccess">#D32B2B</color>
+</resources>
