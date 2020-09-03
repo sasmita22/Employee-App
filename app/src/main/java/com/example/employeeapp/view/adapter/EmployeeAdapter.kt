@@ -61,7 +61,8 @@ class EmployeeAdapter(private val callback: Callback) : RecyclerView.Adapter<Emp
     }
 
     override fun updateData(list: MutableList<Employee>) {
-        this.list = mutableListOf<Employee>().apply { addAll(list) }
+        this.list = mutableListOf<Employee>()
+            .apply { addAll(list) }
         notifyDataSetChanged()
         checkIsListEmpty()
     }
@@ -73,7 +74,8 @@ class EmployeeAdapter(private val callback: Callback) : RecyclerView.Adapter<Emp
     }
 
     private fun checkIsListEmpty() {
-        if (list.size == 0) callback.isListEmpty(true) else callback.isListEmpty(false)
+        if (list.size == 0) callback.isListEmpty(true)
+            else callback.isListEmpty(false)
     }
 
     override fun editData(employee: Employee, position: Int) {
