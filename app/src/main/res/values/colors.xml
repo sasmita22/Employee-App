@@ -9,4 +9,5 @@
     <color name="snackbarAddSuccess">#15B81C</color>
     <color name="snackbarEditSuccess">#096DD6</color>
     <color name="snackbarDeleteSuccess">#D32B2B</color>
+    <color name="snackbarError">#D32B2B</color>
 </resources>

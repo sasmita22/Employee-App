@@ -1,10 +1,9 @@
-package com.example.employeeapp
+package com.example.employeeapp.view.adapter
 
-import java.text.FieldPosition
+import com.example.employeeapp.model.Employee
 
 interface EmployeeAdapterContract {
     fun updateData(list: MutableList<Employee>)
     fun addData(employee: Employee)
     fun editData(employee: Employee, position: Int)
-    fun setCallback(callback: EmployeeAdapter.Callback)
 }
