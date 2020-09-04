@@ -14,10 +14,15 @@ import java.lang.Exception
 class EmployeeViewModel @ViewModelInject constructor(private val employeeRepository: EmployeeRepository) : ViewModel() {
     private val compositeDisposable = CompositeDisposable()
     private val employeeListLiveData = MutableLiveData<ActionResult<List<Employee>>>()
+    private val employeeInsertedLiveData = MutableLiveData<ActionResult<Employee>>()
     private val completableLiveData = MutableLiveData<ActionResult<Boolean>>()
 
     fun getEmployeeListLiveData(): MutableLiveData<ActionResult<List<Employee>>>{
         return employeeListLiveData
+    }
+
+    fun getEmployeeInsertedLiveData(): MutableLiveData<ActionResult<Employee>>{
+        return employeeInsertedLiveData
     }
 
     fun getCompletableLiveData(): MutableLiveData<ActionResult<Boolean>>{
@@ -29,9 +34,9 @@ class EmployeeViewModel @ViewModelInject constructor(private val employeeReposit
             employeeRepository.retrieve()
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
-                    employeeListLiveData.value = ActionResult(it, ActionType.RETRIEVE)
+                    employeeListLiveData.value = ActionResult(it)
                 }, {
-                    employeeListLiveData.value = ActionResult(Exception(it), ActionType.RETRIEVE)
+                    employeeListLiveData.value = ActionResult(Exception(it))
                 })
         )
     }
@@ -41,9 +46,9 @@ class EmployeeViewModel @ViewModelInject constructor(private val employeeReposit
             employeeRepository.insert(employee)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
-                    completableLiveData.value = ActionResult(true, ActionType.INSERT)
+                    employeeInsertedLiveData.value = ActionResult(it)
                 }, {
-                    completableLiveData.value = ActionResult(Exception(it), ActionType.INSERT)
+                    completableLiveData.value = ActionResult(Exception(it))
                 })
         )
     }
@@ -53,9 +58,9 @@ class EmployeeViewModel @ViewModelInject constructor(private val employeeReposit
             employeeRepository.update(employee)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
-                    completableLiveData.value = ActionResult(true, ActionType.UPDATE)
+                    completableLiveData.value = ActionResult(true).apply { type = ActionType.UPDATE }
                 }, {
-                    completableLiveData.value = ActionResult(Exception(it), ActionType.UPDATE)
+                    completableLiveData.value = ActionResult<Boolean>(Exception(it)).apply {  type = ActionType.UPDATE }
                 })
         )
     }
@@ -65,9 +70,9 @@ class EmployeeViewModel @ViewModelInject constructor(private val employeeReposit
             employeeRepository.delete(employee)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
-                    completableLiveData.value = ActionResult(true, ActionType.DELETE)
+                    completableLiveData.value = ActionResult(true).apply { type = ActionType.DELETE }
                 }, {
-                    completableLiveData.value = ActionResult(Exception(it), ActionType.DELETE)
+                    completableLiveData.value = ActionResult<Boolean>(Exception(it)).apply {  type = ActionType.DELETE }
                 })
         )
     }

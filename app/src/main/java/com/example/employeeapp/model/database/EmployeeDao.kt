@@ -8,7 +8,7 @@ import io.reactivex.Single
 @Dao
 interface EmployeeDao {
     @Insert
-    fun insert(employee: Employee): Completable
+    fun insert(employee: Employee): Single<Long>
 
     @Query("select * from employee")
     fun retrieveEmployees() : Single<List<Employee>>

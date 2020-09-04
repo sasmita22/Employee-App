@@ -1,6 +1,5 @@
 package com.example.employeeapp.view
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import androidx.lifecycle.Observer
@@ -10,8 +9,6 @@ import com.example.employeeapp.model.Employee
 import com.example.employeeapp.model.ActionResult
 import com.example.employeeapp.util.ActionType
 import com.example.employeeapp.util.GeneralSnackbar
-import com.example.employeeapp.util.gone
-import com.example.employeeapp.util.visible
 import com.example.employeeapp.view.dialog.DialogFormEmployee.OnCompletionCallback
 import com.example.employeeapp.view.adapter.EmployeeAdapter
 import com.example.employeeapp.view.adapter.EmployeeAdapterContract
@@ -21,7 +18,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.activity_main.*
 
 @AndroidEntryPoint
-class MainActivity : AppCompatActivity() {
+class MainActivity : BaseActivity() {
     private lateinit var adapter: EmployeeAdapterContract
     private lateinit var dialog: DialogFormEmployee
     private lateinit var employeeViewModel: EmployeeViewModel
@@ -45,8 +42,6 @@ class MainActivity : AppCompatActivity() {
                 adapter.editData(employee, position)
                 employeeViewModel.updateEmployee(employee)
             }else{//add
-                adapter.addData(employee)
-                setViewIsEmployeeEmpty(false)
                 employeeViewModel.insertEmployee(employee)
             }
         }
@@ -62,9 +57,19 @@ class MainActivity : AppCompatActivity() {
         setViewModel()
     }
 
-    override fun onResume() {
-        super.onResume()
-        employeeViewModel.retrieveEmployee()
+    private fun setToolbar() {
+        setSupportActionBar(toolbar.apply {
+            title = "List of Employees"
+        })
+    }
+
+    private fun setRecyclerView() {
+        adapter = EmployeeAdapter(
+            recyclerViewCallback
+        ).also {
+            recyclerview.adapter = it
+        }
+        setViewIsEmployeeEmpty(true)
     }
 
     private fun setFormDialog() {
@@ -80,65 +85,46 @@ class MainActivity : AppCompatActivity() {
         employeeViewModel.getCompletableLiveData()
             .observe(this,
                 Observer<ActionResult<Boolean>> {
-                    if (it.result != null){
+                    if (!isResultContainsError(it)){
                         setCompletableData(it)
-                    }else{
-                        GeneralSnackbar.showError(rootView,it.error!!.message!!)
                     }
                 })
 
         employeeViewModel.getEmployeeListLiveData()
             .observe(this,
                 Observer<ActionResult<List<Employee>>> {
-                    if (it.result != null){
+                    if (!isResultContainsError(it)){
                         adapter.updateData(it.result!!.toMutableList())
-                    }else{
-                        GeneralSnackbar.showError(rootView,it.error!!.message!!)
+                    }
+                })
+
+        employeeViewModel.getEmployeeInsertedLiveData()
+            .observe(this,
+                Observer<ActionResult<Employee>>{
+                    if (!isResultContainsError(it)){
+                        setViewIsEmployeeEmpty(false)
+                        adapter.addData(it.result!!)
+                        GeneralSnackbar.showAdditionSuccess(rootView)
                     }
                 })
     }
 
     private fun setCompletableData(actionResult: ActionResult<Boolean>) {
-        if (actionResult.result != null){
+        if (actionResult.type != null){
             when (actionResult.type) {
-                ActionType.INSERT -> {
-                    GeneralSnackbar.showAdditionSuccess(rootView)
-                }
                 ActionType.UPDATE -> {
                     GeneralSnackbar.showEditSuccess(rootView)
                 }
                 ActionType.DELETE -> {
                     GeneralSnackbar.showDeleteSuccess(rootView)
                 }
-                else -> {
-                    //nothing to_do
-                }
             }
         }
-    }
-
-    private fun setRecyclerView() {
-        adapter = EmployeeAdapter(
-            recyclerViewCallback
-        ).also {
-            recyclerview.adapter = it
-        }
-        setViewIsEmployeeEmpty(true)
-    }
-
-    private fun setToolbar() {
-        setSupportActionBar(toolbar.apply {
-            title = "List of Employees"
-        })
     }
 
     fun setViewIsEmployeeEmpty(isEmpty: Boolean){
         recyclerview.visibility = if (!isEmpty) View.VISIBLE else View.GONE
         emptyMessage.visibility = if (isEmpty) View.VISIBLE else View.GONE
-    }
-
-    fun setLoadingMode(isLoading: Boolean){
-        if (isLoading) progressBar.visible() else progressBar.gone()
     }
 
     fun onViewClick(view: View) {
@@ -149,5 +135,8 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-
+    override fun onResume() {
+        super.onResume()
+        employeeViewModel.retrieveEmployee()
+    }
 }

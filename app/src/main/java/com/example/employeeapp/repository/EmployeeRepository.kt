@@ -6,6 +6,7 @@ import com.example.employeeapp.model.database.LocalDatabase
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ApplicationComponent
 import io.reactivex.Completable
+import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
@@ -19,9 +20,16 @@ class EmployeeRepository(localDatabase: LocalDatabase) {
             .subscribeOn(Schedulers.io())
     }
 
-    fun insert(employee: Employee): Completable{
+    fun insert(employee: Employee): Single<Employee>{
         return employeeDao.insert(employee)
             .subscribeOn(Schedulers.io())
+            .flatMap {
+                Single.just(
+                    employee.apply {
+                        id = it.toInt()
+                    }
+                )
+            }
     }
 
     fun update(employee: Employee): Completable{
